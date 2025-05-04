@@ -1,6 +1,6 @@
-.order-item{
+.order-item {
     display: grid;
-    grid-template-columns: 0.5fr 2fr 1fr 1fr 1fr;
+    grid-template-columns: 0.5fr 2.5fr 1fr 1fr 1fr;
     align-items: start;
     gap: 30px;
     border: 1px solid tomato;
@@ -8,35 +8,133 @@
     margin: 30px 0px;
     font-size: 14px;
     color: #505050;
+    border-radius: 10px;
+    background-color: #fffdfc;
 }
-.order-item-food,.order-item-name{
-    font-weight: 600;
+
+.order-item img {
+    width: 50px;
+    height: auto;
 }
-.order-item-name{
-    margin-top: 30px;
+
+.order-item-id,
+.order-item-time {
+    font-size: 12px;
+    color: #999;
     margin-bottom: 5px;
 }
-.order-item-address{
-    margin-bottom: 10px;
+
+.order-item-food,
+.order-item-name {
+    font-weight: 600;
+    margin-bottom: 5px;
 }
-.order-item select{
+
+.order-item-name {
+    margin-top: 10px;
+}
+
+.order-item-address {
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+
+.order-item-phone {
+    font-size: 13px;
+}
+
+.order-item select {
     background-color: #ffe8e4;
     border: 1px solid tomato;
-    width: max(10vw,120px);
+    width: max(10vw, 120px);
     padding: 10px;
-    outline:none;
+    outline: none;
+    font-weight: bold;
+    border-radius: 5px;
 }
-@media(max-width:1000px){
-    .order-item{
+
+/* Dropdown coloring for status */
+.order-status-dropdown.food-processing {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.order-status-dropdown.out-for-delivery {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.order-status-dropdown.delivered {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+@media (max-width: 1000px) {
+    .order-item {
         font-size: 12px;
         grid-template-columns: 0.5fr 2fr 1fr;
         padding: 15px 8px;
+        gap: 15px;
     }
-    .order-item select{
+
+    .order-item select {
         padding: 5px;
         font-size: 12px;
     }
-    .order-item img{
+
+    .order-item img {
         width: 40px;
     }
+
+    .order-item-id,
+    .order-item-time,
+    .order-item-phone,
+    .order-item-address {
+        font-size: 11px;
+    }
 }
+
+.food-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px
+  }
+  
+  .food-stat-card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    text-align: center;
+    border-radius: 8px;
+    background: #fdfdfd;
+  }
+  
+  .food-stat-card img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+
+  .toggle-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .toggle-buttons button {
+    padding: 8px 16px;
+    border: none;
+    background-color: #ddd;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+  
+  .toggle-buttons button.active {
+    background-color: #444;
+    color: #fff;
+  }
+  
+  
+  

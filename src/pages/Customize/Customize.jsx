@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
-import './Add.css'
+import './Customize.css'
 import { assets, url } from '../../assets/assets';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { StoreContext } from '../../Context/StoreContext';
 import { useContext } from 'react';
 
-const Add = () => {
+const Customize = () => {
 
     const {token} = useContext(StoreContext);
 
@@ -104,4 +104,4 @@ const Add = () => {
     )
 }
 
-export default Add
+export default Customize
