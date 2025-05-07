@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useContext } from 'react';
 import './List.css';
-import { url, currency } from '../../assets/assets';
+import { currency } from '../../assets/assets';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { StoreContext } from '../../Context/StoreContext';
 
 const List = () => {
-  const { token, setFoodList } = useContext(StoreContext);
+  const { token, setFoodList,url } = useContext(StoreContext);
   const [list, setList] = useState([]);
   const [editMode, setEditMode] = useState({}); // Track edit mode for each food item
 
