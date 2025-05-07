@@ -8,7 +8,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 
 const LoginPopup = () => {
 
-   const { setToken, url } = useContext(StoreContext)
+   const { setToken, url,setMess,mess,token } = useContext(StoreContext)
     const [currState, setCurrState] = useState("Sign Up");
     const navigate = useNavigate()
 
@@ -38,16 +38,19 @@ const LoginPopup = () => {
         
         const response = await axios.post(new_url, data);
         if (response.data.success) {
-             setToken(response.data.token)
+            setToken(response.data.token)
+            setMess(response.data.mess)
             localStorage.setItem("token", response.data.token)
-            console.log(localStorage.getItem("token"));
+            localStorage.setItem("mess", JSON.stringify(response.data.mess))
+            // console.log(response.data.mess);
+            // console.log(token);
             
             // loadCartData({token:response.data.token})
         }
         else {
             toast.error(response.data.message)
         }
-        navigate('/')
+        navigate('/list')
     }
 
     return (

@@ -6,8 +6,9 @@ import { toast } from 'react-toastify';
 import { StoreContext } from '../../Context/StoreContext';
 
 const List = () => {
-  const { token, setFoodList, food_list } = useContext(StoreContext);
+  const { token, setFoodList } = useContext(StoreContext);
   const [list, setList] = useState([]);
+  const [editMode, setEditMode] = useState({}); // Track edit mode for each food item
 
   const fetchList = async () => {
     const response = await axios.get(`${url}/api/food/list`, { headers: { token } });
@@ -43,6 +44,39 @@ const List = () => {
     }
   };
 
+  const updateFood = async (id, field, value) => {
+    try {
+      const response = await axios.post(`${url}/api/food/update`, { id, field, value });
+      if (response.data.success) {
+        toast.success(response.data.message);
+        fetchList();
+      } else {
+        toast.error("Update failed");
+      }
+    } catch (err) {
+      toast.error("Error updating food item");
+    }
+  };
+
+  const handleInputChange = (index, field, value) => {
+    const updatedList = [...list];
+    updatedList[index][field] = value;
+    setList(updatedList);
+  };
+
+  const toggleEdit = (id) => {
+    setEditMode((prev) => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  const saveChanges = (item) => {
+    updateFood(item._id, "name", item.name);
+    updateFood(item._id, "price", item.price);
+    toggleEdit(item._id);
+  };
+
   useEffect(() => {
     fetchList();
   }, []);
@@ -60,11 +94,32 @@ const List = () => {
           <b>Action</b>
         </div>
         {list.map((item, index) => (
-          <div key={index} className='list-table-format'>
+          <div key={item._id} className='list-table-format'>
             <img src={`${url}/images/${item.image}`} alt={item.name} />
-            <p>{item.name}</p>
+
+            {editMode[item._id] ? (
+              <input
+                type="text"
+                value={item.name}
+                onChange={(e) => handleInputChange(index, "name", e.target.value)}
+              />
+            ) : (
+              <p>{item.name}</p>
+            )}
+
             <p>{item.category}</p>
-            <p>{currency}{item.price}</p>
+
+            {editMode[item._id] ? (
+              <input
+                type="number"
+                min="0"
+                value={item.price}
+                onChange={(e) => handleInputChange(index, "price", e.target.value)}
+              />
+            ) : (
+              <p>{currency}{item.price}</p>
+            )}
+
             <div>
               <label className="switch">
                 <input
@@ -75,7 +130,15 @@ const List = () => {
                 <span className="slider round"></span>
               </label>
             </div>
-            <p className='cursor' onClick={() => removeFood(item._id)}>x</p>
+
+            <div className='action-buttons'>
+              {editMode[item._id] ? (
+                <button onClick={() => saveChanges(item)}>Save</button>
+              ) : (
+                <button onClick={() => toggleEdit(item._id)}>Edit</button>
+              )}
+              <p className='cursor' onClick={() => removeFood(item._id)}>x</p>
+            </div>
           </div>
         ))}
       </div>

@@ -1,107 +1,127 @@
-import React, { useState } from 'react'
-import './Customize.css'
+import React, { useEffect, useState, useContext } from 'react';
+import './Customize.css';
 import { assets, url } from '../../assets/assets';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { StoreContext } from '../../Context/StoreContext';
-import { useContext } from 'react';
 
 const Customize = () => {
+  const { token, mess, setMess } = useContext(StoreContext);
 
-    const {token} = useContext(StoreContext);
+  const [logo, setLogo] = useState(null);
+  const [primaryColor, setPrimaryColor] = useState('#ffffff');
+  const [secondaryColor, setSecondaryColor] = useState('#000000');
+  const [cardColor, setCardColor] = useState('#f5f5f5');
+  const [textColor, setTextColor] = useState('#333333');
 
-    const [image, setImage] = useState(false);
-    const [data, setData] = useState({
-        name: "",
-        description: "",
-        price: "",
-        category: "Salad"
-    });
-
-    const onSubmitHandler = async (event) => {
-        event.preventDefault();
-
-        if (!image) {
-            toast.error('Image not selected');
-            return null;
-        }
-
-        const formData = new FormData();
-        formData.append("name", data.name);
-        formData.append("description", data.description);
-        formData.append("price", Number(data.price));
-        formData.append("category", data.category);
-        formData.append("image", image);
-        console.log(token);
-        
-        const response = await axios.post(`${url}/api/food/add`, formData, { headers: { token } });
-        if (response.data.success) {
-            toast.success(response.data.message)
-            setData({
-                name: "",
-                description: "",
-                price: "",
-                category: data.category
-            })
-            setImage(false);
-        }
-        else {
-            toast.error(response.data.message)
-        }
+  useEffect(() => {
+    if (!mess) {
+      setMess(JSON.parse(localStorage.getItem("mess")));
     }
-
-    const onChangeHandler = (event) => {
-        const name = event.target.name;
-        const value = event.target.value;
-        setData(data => ({ ...data, [name]: value }))
+    if (mess) {
+      if (mess.primaryColor) setPrimaryColor(mess.primaryColor);
+      if (mess.secondaryColor) setSecondaryColor(mess.secondaryColor);
+      if (mess.cardColor) setCardColor(mess.cardColor);
+      if (mess.textColor) setTextColor(mess.textColor);
     }
+  }, [mess]);
 
-    return (
-        <div className='add'>
-            <form className='flex-col' onSubmit={onSubmitHandler}>
-                <div className='add-img-upload flex-col'>
-                    <p>Upload image</p>
-                    <input onChange={(e) => { setImage(e.target.files[0]); e.target.value = '' }} type="file" accept="image/*" id="image" hidden />
-                    <label htmlFor="image">
-                        <img src={!image ? assets.upload_area : URL.createObjectURL(image)} alt="" />
-                    </label>
-                </div>
-                <div className='add-product-name flex-col'>
-                    <p>Product name</p>
-                    <input name='name' onChange={onChangeHandler} value={data.name} type="text" placeholder='Type here' required />
-                </div>
-                <div className='add-product-description flex-col'>
-                    <p>Product description</p>
-                    <textarea name='description' onChange={onChangeHandler} value={data.description} type="text" rows={6} placeholder='Write content here' required />
-                </div>
-                <div className='add-category-price'>
-                    <div className='add-category flex-col'>
-                        <p>Product category</p>
-                        <select name='category' onChange={onChangeHandler} >
-                            <option value="Salad">Salad</option>
-                            <option value="Rolls">Rolls</option>
-                            <option value="Deserts">Deserts</option>
-                            <option value="Sandwich">Sandwich</option>
-                            <option value="Cake">Cake</option>
-                            <option value="Pure Veg">Pure Veg</option>
-                            <option value="Pasta">Pasta</option>
-                            <option value="Noodles">Noodles</option>
-                            <option value="Chicken">Chicken</option>
-                            <option value="Rice">Rice</option>
-                            <option value="Tiffin">Tiffin</option>
-                            <option value="Mutton">Mutton</option>
-                            <option value="Biryani">Biryani</option>
-                        </select>
-                    </div>
-                    <div className='add-price flex-col'>
-                        <p>Product Price</p>
-                        <input type="Number" name='price' onChange={onChangeHandler} value={data.price} placeholder='25' />
-                    </div>
-                </div>
-                <button type='submit' className='add-btn' >ADD</button>
-            </form>
-        </div>
-    )
-}
+  const handleSave = async () => {
+    const formData = new FormData();
+    if (logo) formData.append('image', logo);
+    formData.append('primaryColor', primaryColor);
+    formData.append('secondaryColor', secondaryColor);
+    formData.append('cardColor', cardColor);
+    formData.append('textColor', textColor);
 
-export default Customize
+    try {
+      const response = await axios.post(`${url}/api/mess/theme`, formData, {
+        headers: { token }
+      });
+
+      if (response.data.success) {
+        toast.success('Customization saved');
+        // Optionally update store context or re-fetch the mess data
+      } else {
+        toast.error('Failed to save customization');
+      }
+    } catch (err) {
+      toast.error('Something went wrong');
+    }
+  };
+
+  const previewImage = () => {
+    if (logo) return URL.createObjectURL(logo);
+    if (mess?.image) return `${url}/images/${mess.image}`;
+    return assets.upload_area;
+  };
+
+  return (
+    <div className='customize'>
+      <h2>Admin Theme Customization</h2>
+
+      <div className='customize-section'>
+        <p>Upload Logo</p>
+        <input
+          onChange={(e) => {
+            setLogo(e.target.files[0]);
+            e.target.value = '';
+          }}
+          type="file"
+          accept="image/*"
+          id="logo"
+          hidden
+        />
+        <label htmlFor="logo">
+          <img
+            src={previewImage()}
+            alt="logo-preview"
+            className="logo-preview"
+          />
+        </label>
+      </div>
+
+      <div className='customize-section'>
+        <label>Primary Color</label>
+        <input
+          type="color"
+          value={primaryColor}
+          onChange={(e) => setPrimaryColor(e.target.value)}
+        />
+      </div>
+
+      <div className='customize-section'>
+        <label>Secondary Color</label>
+        <input
+          type="color"
+          value={secondaryColor}
+          onChange={(e) => setSecondaryColor(e.target.value)}
+        />
+      </div>
+
+      <div className='customize-section'>
+        <label>Card Background Color</label>
+        <input
+          type="color"
+          value={cardColor}
+          onChange={(e) => setCardColor(e.target.value)}
+        />
+      </div>
+
+      <div className='customize-section'>
+        <label>Text Color</label>
+        <input
+          type="color"
+          value={textColor}
+          onChange={(e) => setTextColor(e.target.value)}
+        />
+      </div>
+
+      <button className='customize-btn' onClick={handleSave}>
+        Save Changes
+      </button>
+    </div>
+  );
+};
+
+export default Customize;
